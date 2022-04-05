@@ -14,6 +14,7 @@ import SettingsModal from 'sections/shared/modals/SettingsModal';
 
 import NetworksSwitcher from '../NetworksSwitcher';
 import WalletActions from '../WalletActions';
+import BalanceNav from '../BalanceNav';
 import ConnectionDot from '../ConnectionDot';
 
 const UserMenu: FC = () => {
@@ -26,6 +27,7 @@ const UserMenu: FC = () => {
 		<>
 			<Container>
 				<FlexDivCentered>
+					{isWalletConnected && <BalanceNav />}
 					{isWalletConnected && <NetworksSwitcher />}
 					{isWalletConnected ? (
 						<WalletActions />
