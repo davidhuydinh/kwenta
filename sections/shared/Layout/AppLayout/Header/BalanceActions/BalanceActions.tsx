@@ -2,7 +2,6 @@ import useSynthetixQueries from '@synthetixio/queries';
 import Button from 'components/Button';
 import CurrencyIcon from 'components/Currency/CurrencyIcon';
 import Select from 'components/Select';
-import { IndicatorSeparator } from 'components/Select/Select';
 import { Synths } from 'constants/currency';
 import Connector from 'containers/Connector';
 import { useRouter } from 'next/router';
@@ -10,11 +9,11 @@ import { FuturesPosition, FuturesMarket } from 'queries/futures/types';
 import { Dispatch, SetStateAction } from 'react';
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { components } from 'react-select';
+import { components, GroupProps } from 'react-select';
 import { useRecoilValue } from 'recoil';
 import { walletAddressState } from 'store/wallet';
 import styled, { useTheme } from 'styled-components';
-import { FlexDivCol, FlexDivRow, FlexDivRowCentered } from 'styles/common';
+import { FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import { formatCurrency, zeroBN } from 'utils/formatters/number';
 import { getDisplayAsset, getMarketKey } from 'utils/futures';
 
@@ -52,6 +51,7 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 		(prev, position) => prev.add(position.remainingMargin),
 		zeroBN
 	);
+	// const totalRemainingMargin = '$123,123,123,123.00';
 
 	const setMarketConfig = (asset: string) => {
 		const remainingMargin =
@@ -80,15 +80,10 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 		totalAvailableMargin?: string;
 	}> = ({ label, totalAvailableMargin }) => {
 		return (
-			<FlexDivCol>
-				<StyledButton onClick={() => setShowUniswapWidget(true)}>
-					{t('header.balance.get-susd')}
-				</StyledButton>
-				<FlexDivRow>
-					<Container>{t(label)}</Container>
-					<Container>{totalAvailableMargin}</Container>
-				</FlexDivRow>
-			</FlexDivCol>
+			<FlexDivRow>
+				<Container>{t(label)}</Container>
+				<Container>{totalAvailableMargin}</Container>
+			</FlexDivRow>
 		);
 	};
 
@@ -107,10 +102,13 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 		</LabelContainer>
 	);
 
-	const DropdownIndicator = (props: any) => (
-		<components.DropdownIndicator {...props}>
-			<div></div>
-		</components.DropdownIndicator>
+	const Group: FC<GroupProps<any>> = ({ children, ...props }) => (
+		<components.Group {...props}>
+			<StyledOptions>{children}</StyledOptions>
+			<StyledButton onClick={() => setShowUniswapWidget(true)}>
+				{t('header.balance.get-more-susd')}
+			</StyledButton>
+		</components.Group>
 	);
 
 	return (
@@ -123,8 +121,8 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 				value={{ label: balanceLabel, synthIcon: Synths.sUSD }}
 				menuWidth={350}
 				optionPadding={'0px'} //override default padding to 0
-				optionBorderBottom={`${theme.colors.stormcloud} 1px solid`}
-				components={{ IndicatorSeparator, DropdownIndicator }}
+				optionBorderBottom={theme.colors.selectedTheme.border}
+				components={{ Group, DropdownIndicator: () => null, IndicatorSeparator: () => null }}
 				isSearchable={false}
 			></BalanceSelect>
 		</Container>
@@ -148,11 +146,6 @@ const BalanceSelect = styled(Select)<{ value: { label: string } }>`
 		padding-top: 0px;
 		padding-bottom: 0px;
 
-		> div:nth-child(2) {
-			border-radius: 5px;
-			border: ${(props) => props.theme.colors.stormcloud} 1px solid;
-		}
-
 		.react-select__group-heading {
 			color: ${(props) => props.theme.colors.white};
 			font-size: 12px;
@@ -161,10 +154,6 @@ const BalanceSelect = styled(Select)<{ value: { label: string } }>`
 			padding-right: 0px;
 			text-transform: none;
 		}
-
-		.react-select__option:not(:last-child) {
-			border-bottom: ${(props) => props.theme.colors.stormcloud} 1px solid;
-		}
 	}
 
 	.react-select__value-container {
@@ -172,6 +161,11 @@ const BalanceSelect = styled(Select)<{ value: { label: string } }>`
 		display: flex;
 		justify-content: center;
 	}
+`;
+
+const StyledOptions = styled.div`
+	border-radius: 10px;
+	border: ${(props) => props.theme.colors.selectedTheme.border};
 `;
 
 const StyledCurrencyIcon = styled(CurrencyIcon)`
@@ -190,8 +184,8 @@ const LabelContainer = styled(FlexDivRowCentered)<{ noPadding: boolean }>`
 `;
 
 const StyledButton = styled(Button)`
+	width: 100%;
 	font-size: 13px;
-	margin-bottom: 10px;
-	white-space: nowrap;
+	margin-top: 10px;
 	align-items: center;
 `;

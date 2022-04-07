@@ -15,7 +15,7 @@ import SettingsModal from 'sections/shared/modals/SettingsModal';
 import NetworksSwitcher from '../NetworksSwitcher';
 import WalletActions from '../WalletActions';
 import ConnectionDot from '../ConnectionDot';
-import BalanceActionsContainer from '../BalanceActions/BalanceActionsContainer';
+import BalanceActionsContainer from '../BalanceActions';
 
 const UserMenu: FC = () => {
 	const { t } = useTranslation();

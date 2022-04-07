@@ -31,6 +31,7 @@
 		},
 		"balance": {
 			"get-susd": "Get sUSD",
+			"get-more-susd": "Get more sUSD",
 			"margin-label": "Available Margin:"
 		}
 	},
