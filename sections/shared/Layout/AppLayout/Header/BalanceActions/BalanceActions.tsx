@@ -51,7 +51,6 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 		(prev, position) => prev.add(position.remainingMargin),
 		zeroBN
 	);
-	// const totalRemainingMargin = '$123,123,123,123.00';
 
 	const setMarketConfig = (asset: string) => {
 		const remainingMargin =
@@ -98,7 +97,7 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 				{synthIcon && <StyledCurrencyIcon currencyKey={synthIcon} />}
 				<StyledLabel noPadding={!synthIcon}>{t(label)}</StyledLabel>
 			</FlexDivRow>
-			{marketRemainingMargin}
+			<Container>{marketRemainingMargin}</Container>
 		</LabelContainer>
 	);
 
@@ -181,6 +180,7 @@ const LabelContainer = styled(FlexDivRowCentered)<{ noPadding: boolean }>`
 	color: ${(props) => props.theme.colors.white};
 	padding: ${(props) => !props.noPadding && '6px'};
 	font-size: 13px;
+	padding: 10px;
 `;
 
 const StyledButton = styled(Button)`
