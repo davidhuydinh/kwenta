@@ -44,7 +44,6 @@ const BalanceActionsContainer: FC = () => {
 				</StyledButton>
 			) : (
 				<BalanceActions
-					futuresMarkets={futuresMarkets}
 					futuresPositions={futuresPositions}
 					setShowUniswapWidget={setUniswapWidgetOpened}
 				/>

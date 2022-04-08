@@ -5,11 +5,11 @@ import Select from 'components/Select';
 import { Synths } from 'constants/currency';
 import Connector from 'containers/Connector';
 import { useRouter } from 'next/router';
-import { FuturesPosition, FuturesMarket } from 'queries/futures/types';
+import { FuturesPosition } from 'queries/futures/types';
 import { Dispatch, SetStateAction } from 'react';
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { components, GroupProps } from 'react-select';
+import { components } from 'react-select';
 import { useRecoilValue } from 'recoil';
 import { walletAddressState } from 'store/wallet';
 import styled, { useTheme } from 'styled-components';
@@ -20,18 +20,16 @@ import { getDisplayAsset, getMarketKey } from 'utils/futures';
 type ReactSelectOptionProps = {
 	label: string;
 	synthIcon: string;
-	marketRemainingMargin?: string;
+	marketAccessibleMargin?: string;
 	onClick?: () => {};
 };
 
 type FuturesPositionTableProps = {
-	futuresMarkets: FuturesMarket[];
 	futuresPositions: FuturesPosition[];
 	setShowUniswapWidget: Dispatch<SetStateAction<boolean>>;
 };
 
 const BalanceActions: FC<FuturesPositionTableProps> = ({
-	futuresMarkets,
 	futuresPositions,
 	setShowUniswapWidget,
 }) => {
@@ -47,21 +45,25 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 
 	const balanceLabel = formatCurrency(Synths.sUSD, sUSDBalance, { sign: '$' });
 
-	const totalRemainingMargin = futuresPositions.reduce(
-		(prev, position) => prev.add(position.remainingMargin),
+	const accessiblePositions = futuresPositions.filter((position) =>
+		position.accessibleMargin.gt(zeroBN)
+	);
+
+	const totalAccessibleMargin = accessiblePositions.reduce(
+		(prev, position) => prev.add(position.accessibleMargin),
 		zeroBN
 	);
 
 	const setMarketConfig = (asset: string) => {
-		const remainingMargin =
-			futuresPositions.find((posittion) => posittion.asset === asset)?.remainingMargin ?? zeroBN;
+		const accessibleMargin =
+			futuresPositions.find((posittion) => posittion.asset === asset)?.accessibleMargin ?? zeroBN;
 
 		const marketKey = getMarketKey(asset, network.id);
 
 		return {
 			label: `${getDisplayAsset(asset, network.id)}-PERP`,
 			synthIcon: marketKey,
-			marketRemainingMargin: formatCurrency(Synths.sUSD, remainingMargin, { sign: '$' }),
+			marketAccessibleMargin: formatCurrency(Synths.sUSD, accessibleMargin, { sign: '$' }),
 			onClick: () => router.push(`/market/${marketKey}`),
 		};
 	};
@@ -69,8 +71,8 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 	const OPTIONS = [
 		{
 			label: 'header.balance.margin-label',
-			totalAvailableMargin: formatCurrency(Synths.sUSD, totalRemainingMargin, { sign: '$' }),
-			options: futuresMarkets.map((market) => setMarketConfig(market.asset)),
+			totalAvailableMargin: formatCurrency(Synths.sUSD, totalAccessibleMargin, { sign: '$' }),
+			options: accessiblePositions.map((market) => setMarketConfig(market.asset)),
 		},
 	];
 
@@ -89,7 +91,7 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 	const formatOptionLabel = ({
 		label,
 		synthIcon,
-		marketRemainingMargin,
+		marketAccessibleMargin,
 		onClick,
 	}: ReactSelectOptionProps) => (
 		<LabelContainer noPadding={synthIcon === 'sUSD'} onClick={onClick}>
@@ -97,18 +99,31 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 				{synthIcon && <StyledCurrencyIcon currencyKey={synthIcon} />}
 				<StyledLabel noPadding={!synthIcon}>{t(label)}</StyledLabel>
 			</FlexDivRow>
-			<Container>{marketRemainingMargin}</Container>
+			<Container>{marketAccessibleMargin}</Container>
 		</LabelContainer>
 	);
 
-	const Group: FC<GroupProps<any>> = ({ children, ...props }) => (
+	const UniswapButton = () => (
+		<StyledButton onClick={() => setShowUniswapWidget(true)}>
+			{t('header.balance.get-more-susd')}
+		</StyledButton>
+	);
+
+	const Group: FC<any> = ({ children, ...props }) => (
 		<components.Group {...props}>
 			<StyledOptions>{children}</StyledOptions>
-			<StyledButton onClick={() => setShowUniswapWidget(true)}>
-				{t('header.balance.get-more-susd')}
-			</StyledButton>
+			<UniswapButton />
 		</components.Group>
 	);
+
+	const NoOptionsMessage: FC<any> = (props) => {
+		return (
+			<components.NoOptionsMessage {...props}>
+				{t('header.balance.no-accessible-margin')}
+				<UniswapButton />
+			</components.NoOptionsMessage>
+		);
+	};
 
 	return (
 		<Container>
@@ -122,7 +137,12 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 				maxMenuHeight={500}
 				optionPadding={'0px'} //override default padding to 0
 				optionBorderBottom={theme.colors.selectedTheme.border}
-				components={{ Group, DropdownIndicator: () => null, IndicatorSeparator: () => null }}
+				components={{
+					Group,
+					NoOptionsMessage,
+					DropdownIndicator: () => null,
+					IndicatorSeparator: () => null,
+				}}
 				isSearchable={false}
 			></BalanceSelect>
 		</Container>

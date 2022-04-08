@@ -32,7 +32,8 @@
 		"balance": {
 			"get-susd": "Get sUSD",
 			"get-more-susd": "Get more sUSD",
-			"margin-label": "Available Margin:"
+			"margin-label": "Available Margin:",
+			"no-accessible-margin": "You have no accessible margin"
 		}
 	},
 	"homepage": {
