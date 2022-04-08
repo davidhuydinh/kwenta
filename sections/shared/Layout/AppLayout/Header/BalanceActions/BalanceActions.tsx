@@ -104,7 +104,7 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 	);
 
 	const UniswapButton = () => (
-		<StyledButton onClick={() => setShowUniswapWidget(true)}>
+		<StyledButton textTransform="none" onClick={() => setShowUniswapWidget(true)}>
 			{t('header.balance.get-more-susd')}
 		</StyledButton>
 	);

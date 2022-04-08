@@ -38,7 +38,7 @@ const BalanceActionsContainer: FC = () => {
 	return (
 		<Container>
 			{sUSDBalance === zeroBN ? (
-				<StyledButton onClick={() => setUniswapWidgetOpened(true)}>
+				<StyledButton textTransform="none" onClick={() => setUniswapWidgetOpened(true)}>
 					<StyledCurrencyIcon currencyKey={Synths.sUSD} />
 					{t('header.balance.get-susd')}
 				</StyledButton>
