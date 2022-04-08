@@ -1,20 +1,22 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import Button from 'components/Button';
-import { PositionSide } from '../types';
+import { MarketState, PositionSide } from '../types';
 
 interface PositionButtonsProps {
 	selected: PositionSide;
+	marketState: MarketState;
 	onSelect(position: PositionSide): void;
 }
 
-const PositionButtons: React.FC<PositionButtonsProps> = ({ selected, onSelect }) => {
+const PositionButtons: React.FC<PositionButtonsProps> = ({ selected, marketState, onSelect }) => {
 	return (
 		<PositionButtonsContainer>
 			<StyledPositionButton
 				fullWidth
 				$position={PositionSide.LONG}
 				$isActive={selected === 'long'}
+				disabled={marketState === MarketState.PAUSED}
 				onClick={() => onSelect(PositionSide.LONG)}
 			>
 				Long
@@ -23,6 +25,7 @@ const PositionButtons: React.FC<PositionButtonsProps> = ({ selected, onSelect })
 				fullWidth
 				$position={PositionSide.SHORT}
 				$isActive={selected === 'short'}
+				disabled={marketState === MarketState.PAUSED}
 				onClick={() => onSelect(PositionSide.SHORT)}
 			>
 				Short
@@ -48,6 +51,14 @@ const StyledPositionButton = styled(Button)<PositionButtonProps>`
 	font-size: 16px;
 	height: 55px;
 	transition: all 0.1s ease-in-out;
+
+	&:disabled {
+		border: 1px solid #2b2a2a;
+		background: none;
+		&:hover {
+			background: none;
+		}
+	}
 
 	${(props) =>
 		props.$position === PositionSide.LONG &&
