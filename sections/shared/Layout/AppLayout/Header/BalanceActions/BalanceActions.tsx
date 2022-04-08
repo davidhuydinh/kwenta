@@ -119,6 +119,7 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 				options={OPTIONS}
 				value={{ label: balanceLabel, synthIcon: Synths.sUSD }}
 				menuWidth={350}
+				maxMenuHeight={500}
 				optionPadding={'0px'} //override default padding to 0
 				optionBorderBottom={theme.colors.selectedTheme.border}
 				components={{ Group, DropdownIndicator: () => null, IndicatorSeparator: () => null }}
@@ -137,7 +138,7 @@ const Container = styled.div`
 
 const BalanceSelect = styled(Select)<{ value: { label: string } }>`
 	.react-select__control {
-		min-width: ${(props) => props.value.label.length * 5 + 100}px;
+		width: ${(props) => 5 * props.value.label.length + 90}px;
 	}
 
 	.react-select__group {
@@ -155,6 +156,13 @@ const BalanceSelect = styled(Select)<{ value: { label: string } }>`
 		}
 	}
 
+	.react-select__menu-list {
+		::-webkit-scrollbar {
+			width: 0; /* Remove scrollbar space */
+			background: transparent; /* Optional: just make scrollbar invisible */
+		}
+	}
+
 	.react-select__value-container {
 		padding: 0px;
 		display: flex;
@@ -169,16 +177,18 @@ const StyledOptions = styled.div`
 
 const StyledCurrencyIcon = styled(CurrencyIcon)`
 	margin-right: 5px;
+	height: 22px;
+	width: 22px;
 `;
 
 const StyledLabel = styled.div<{ noPadding: boolean }>`
-	padding-top: ${(props) => !props.noPadding && '5px'};
+	padding-top: 4px;
 	white-space: nowrap;
 `;
 
 const LabelContainer = styled(FlexDivRowCentered)<{ noPadding: boolean }>`
 	color: ${(props) => props.theme.colors.white};
-	padding: ${(props) => !props.noPadding && '6px'};
+	padding: 10px;
 	font-size: 13px;
 	padding: 10px;
 `;
