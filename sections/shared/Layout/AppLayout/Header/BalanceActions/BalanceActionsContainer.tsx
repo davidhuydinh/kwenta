@@ -49,7 +49,7 @@ const BalanceActionsContainer: FC = () => {
 				/>
 			)}
 
-			{uniswapWidgetOpened && <UniswapModal onDismiss={() => setUniswapWidgetOpened(false)} />}
+			<UniswapModal isOpen={uniswapWidgetOpened} onDismiss={() => setUniswapWidgetOpened(false)} />
 		</Container>
 	);
 };

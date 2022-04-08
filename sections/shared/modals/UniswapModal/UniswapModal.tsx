@@ -1,55 +1,47 @@
 import { Synths } from '@synthetixio/contracts-interface';
-import { SwapWidget, TokenInfo } from '@uniswap/widgets';
+import { Theme, SwapWidget, TokenInfo } from '@uniswap/widgets';
 import BaseModal from 'components/BaseModal';
 import Connector from 'containers/Connector';
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { getInfuraRpcURL } from 'utils/infura';
+import DEFAULT_TOKEN_LIST from './defaultTokenList.json';
 
 // special referece on the uniswap widget
 // represents the Native Token of the current chain (typically ETH)
 const NATIVE = 'NATIVE';
 
-const DEFAULT_TOKEN_LIST: TokenInfo[] = [
-	{
-		chainId: 69,
-		address: '0xaA5068dC2B3AADE533d3e52C6eeaadC6a8154c57',
-		name: 'Synthetix USD',
-		symbol: 'sUSD',
-		decimals: 18,
-		logoURI:
-			'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.12/synths/sUSD.svg',
-	},
-	{
-		chainId: 10,
-		address: '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9',
-		name: 'Synthetix USD',
-		symbol: 'sUSD',
-		decimals: 18,
-		logoURI:
-			'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.12/synths/sUSD.svg',
-	},
-	{
-		chainId: 1,
-		address: '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51',
-		symbol: 'sUSD',
-		name: 'Synth US Dollars',
-		decimals: 18,
-		logoURI:
-			'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.12/synths/sUSD.svg',
-		tags: ['synth'],
-	},
-];
-
 type UniswapModalProps = {
 	onDismiss: () => void;
+	isOpen: boolean;
 	tokenList?: TokenInfo[];
 	inputTokenAddress?: string;
 	outputTokenAddress?: string;
 };
 
+const theme: Theme = {
+	primary: '#070A16',
+	secondary: '#616677',
+	interactive: '#C9975B',
+	container: '#F4F6FE',
+	module: '#DBE1F5',
+	accent: '#C9975B',
+	dialog: '#070A16',
+	fontFamily: 'Inter',
+	borderRadius: 0.8,
+	error: '#EF6868',
+	// outline: '',
+	// onAccent: '',
+	// onInteractive: '',
+	// hint: '',
+	active: '#407CF8',
+	success: '#1A9550',
+	warning: '#EF6868',
+};
+
 const UniswapModal: FC<UniswapModalProps> = ({
+	isOpen,
 	onDismiss,
 	tokenList,
 	inputTokenAddress,
@@ -57,16 +49,17 @@ const UniswapModal: FC<UniswapModalProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const { provider, network } = Connector.useContainer();
-
+	console.log(DEFAULT_TOKEN_LIST);
 	const infuraRpc = getInfuraRpcURL(network.id);
 	const TOKEN_LIST = tokenList || DEFAULT_TOKEN_LIST.filter((t) => t.chainId === network.id);
 	const OUTPUT_TOKEN_ADDRESS =
 		outputTokenAddress || TOKEN_LIST.find((t) => t.symbol === Synths.sUSD)?.address!;
 
 	return (
-		<StyledBaseModal onDismiss={onDismiss} isOpen={true} title={t('modals.uniswap-widget.title')}>
+		<StyledBaseModal onDismiss={onDismiss} isOpen={isOpen} title="">
 			<div className="Uniswap">
 				<SwapWidget
+					theme={theme}
 					provider={provider as any}
 					jsonRpcEndpoint={infuraRpc}
 					tokenList={TOKEN_LIST}
@@ -87,12 +80,12 @@ const StyledBaseModal = styled(BaseModal)`
 		justify-content: center;
 	}
 
-	.card-body {
-		padding: 10px;
+	.card-header {
+		display: none;
 	}
 
 	.card-body {
-		padding: 25px;
+		padding: 0px;
 		padding-top: 0px;
 	}
 `;
