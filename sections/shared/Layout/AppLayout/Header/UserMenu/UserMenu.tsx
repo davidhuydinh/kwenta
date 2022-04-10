@@ -15,19 +15,35 @@ import SettingsModal from 'sections/shared/modals/SettingsModal';
 import NetworksSwitcher from '../NetworksSwitcher';
 import WalletActions from '../WalletActions';
 import ConnectionDot from '../ConnectionDot';
-import BalanceActionsContainer from '../BalanceActions';
+import useGetFuturesMarkets from 'queries/futures/useGetFuturesMarkets';
+import useGetFuturesPositionForMarkets from 'queries/futures/useGetFuturesPositionForMarkets';
+import UniswapModal from 'sections/shared/modals/UniswapModal';
+import BalanceActions from '../BalanceActions';
 
 const UserMenu: FC = () => {
 	const { t } = useTranslation();
 	const isWalletConnected = useRecoilValue(isWalletConnectedState);
 	const { connectWallet } = Connector.useContainer();
 	const [settingsModalOpened, setSettingsModalOpened] = useState<boolean>(false);
+	const [uniswapWidgetOpened, setUniswapWidgetOpened] = useState<boolean>(false);
+
+	const futuresMarketsQuery = useGetFuturesMarkets();
+	const futuresMarkets = futuresMarketsQuery?.data ?? [];
+	const futuresPositionQuery = useGetFuturesPositionForMarkets(
+		futuresMarkets.map(({ asset }) => asset)
+	);
+	const futuresPositions = futuresPositionQuery?.data ?? [];
 
 	return (
 		<>
 			<Container>
 				<FlexDivCentered>
-					{isWalletConnected && <BalanceActionsContainer />}
+					{isWalletConnected && (
+						<BalanceActions
+							futuresPositions={futuresPositions}
+							setShowUniswapWidget={setUniswapWidgetOpened}
+						/>
+					)}
 					{isWalletConnected && <NetworksSwitcher />}
 					{isWalletConnected ? (
 						<WalletActions />
@@ -56,6 +72,7 @@ const UserMenu: FC = () => {
 				</FlexDivCentered>
 			</Container>
 			{settingsModalOpened && <SettingsModal onDismiss={() => setSettingsModalOpened(false)} />}
+			{uniswapWidgetOpened && <UniswapModal onDismiss={() => setUniswapWidgetOpened(false)} />}
 		</>
 	);
 };

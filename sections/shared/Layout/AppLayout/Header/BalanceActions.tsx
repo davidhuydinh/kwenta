@@ -6,7 +6,7 @@ import { Synths } from 'constants/currency';
 import Connector from 'containers/Connector';
 import { useRouter } from 'next/router';
 import { FuturesPosition } from 'queries/futures/types';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { components } from 'react-select';
@@ -33,6 +33,7 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 	futuresPositions,
 	setShowUniswapWidget,
 }) => {
+	const [balanceLabel, setBalanceLabel] = useState('');
 	const { t } = useTranslation();
 	const theme = useTheme();
 	const router = useRouter();
@@ -42,8 +43,6 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 	const { useSynthsBalancesQuery } = useSynthetixQueries();
 	const synthsBalancesQuery = useSynthsBalancesQuery(walletAddress);
 	const sUSDBalance = synthsBalancesQuery?.data?.balancesMap?.[Synths.sUSD]?.balance ?? zeroBN;
-
-	const balanceLabel = formatCurrency(Synths.sUSD, sUSDBalance, { sign: '$' });
 
 	const accessiblePositions = futuresPositions.filter((position) =>
 		position.accessibleMargin.gt(zeroBN)
@@ -125,26 +124,41 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 		);
 	};
 
+	useEffect(() => {
+		setBalanceLabel(formatCurrency(Synths.sUSD, sUSDBalance, { sign: '$' }));
+	}, [balanceLabel, sUSDBalance]);
+
+	if (!balanceLabel) {
+		return null;
+	}
+
 	return (
 		<Container>
-			<BalanceSelect
-				formatOptionLabel={formatOptionLabel}
-				formatGroupLabel={OptionsGroupLabel}
-				controlHeight={41}
-				options={OPTIONS}
-				value={{ label: balanceLabel, synthIcon: Synths.sUSD }}
-				menuWidth={350}
-				maxMenuHeight={500}
-				optionPadding={'0px'} //override default padding to 0
-				optionBorderBottom={theme.colors.selectedTheme.border}
-				components={{
-					Group,
-					NoOptionsMessage,
-					DropdownIndicator: () => null,
-					IndicatorSeparator: () => null,
-				}}
-				isSearchable={false}
-			></BalanceSelect>
+			{sUSDBalance === zeroBN ? (
+				<StyledWidgetButton textTransform="none" onClick={() => setShowUniswapWidget(true)}>
+					<StyledCurrencyIcon currencyKey={Synths.sUSD} />
+					{t('header.balance.get-susd')}
+				</StyledWidgetButton>
+			) : (
+				<BalanceSelect
+					formatOptionLabel={formatOptionLabel}
+					formatGroupLabel={OptionsGroupLabel}
+					controlHeight={41}
+					options={OPTIONS}
+					value={{ label: balanceLabel, synthIcon: Synths.sUSD }}
+					menuWidth={350}
+					maxMenuHeight={500}
+					optionPadding={'0px'} //override default padding to 0
+					optionBorderBottom={theme.colors.selectedTheme.border}
+					components={{
+						Group,
+						NoOptionsMessage,
+						DropdownIndicator: () => null,
+						IndicatorSeparator: () => null,
+					}}
+					isSearchable={false}
+				></BalanceSelect>
+			)}
 		</Container>
 	);
 };
@@ -217,5 +231,14 @@ const StyledButton = styled(Button)`
 	width: 100%;
 	font-size: 13px;
 	margin-top: 10px;
+	align-items: center;
+`;
+
+const StyledWidgetButton = styled(Button)`
+	font-size: 13px;
+	padding: 10px;
+	white-space: nowrap;
+	display: flex;
+	justify-content: space-between;
 	align-items: center;
 `;

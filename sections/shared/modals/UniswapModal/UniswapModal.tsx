@@ -1,11 +1,11 @@
 import { Synths } from '@synthetixio/contracts-interface';
-import { Theme, SwapWidget, TokenInfo } from '@uniswap/widgets';
+import { SwapWidget, Theme, TokenInfo } from '@uniswap/widgets';
 import BaseModal from 'components/BaseModal';
 import Connector from 'containers/Connector';
 import { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { getInfuraRpcURL } from 'utils/infura';
+
 import DEFAULT_TOKEN_LIST from './defaultTokenList.json';
 
 // special referece on the uniswap widget
@@ -14,7 +14,7 @@ const NATIVE = 'NATIVE';
 
 type UniswapModalProps = {
 	onDismiss: () => void;
-	isOpen: boolean;
+	isOpen?: boolean;
 	tokenList?: TokenInfo[];
 	inputTokenAddress?: string;
 	outputTokenAddress?: string;
@@ -42,13 +42,12 @@ const theme: Theme = {
 };
 
 const UniswapModal: FC<UniswapModalProps> = ({
-	isOpen,
+	isOpen = true,
 	onDismiss,
 	tokenList,
 	inputTokenAddress,
 	outputTokenAddress,
 }) => {
-	const { t } = useTranslation();
 	const { provider, network } = Connector.useContainer();
 	const infuraRpc = getInfuraRpcURL(network.id);
 	const normalizedTokenList = (tokenList || DEFAULT_TOKEN_LIST).filter(
