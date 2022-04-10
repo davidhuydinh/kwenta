@@ -70,13 +70,13 @@ function Select<T>(props: Props<T>) {
 				border: colors.selectedTheme.border,
 				borderStyle: 'solid',
 				outline: 'none',
-				'.react-select__option:first-child:hover': {
-					'border-top-left-radius': '10px',
-					'border-top-right-radius': '10px',
+				'div.react-select__option:first-of-type:hover': {
+					borderTopLeftRadius: '10px',
+					borderTopRightRadius: '10px',
 				},
-				'.react-select__option:last-child:hover': {
-					'border-bottom-left-radius': '10px',
-					'border-bottom-rigth-radius': '10px',
+				'div.react-select__option:last-of-type:hover': {
+					borderBottomLeftRadius: '10px',
+					borderBottomRigthRadius: '10px',
 				},
 			}),
 			option: (provided, state) => ({

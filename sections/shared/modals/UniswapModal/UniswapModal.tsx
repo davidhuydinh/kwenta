@@ -23,11 +23,11 @@ type UniswapModalProps = {
 const theme: Theme = {
 	primary: '#070A16',
 	secondary: '#616677',
-	interactive: '#C9975B',
+	interactive: '#C0C7DD',
 	container: '#F4F6FE',
 	module: '#DBE1F5',
 	accent: '#C9975B',
-	dialog: '#070A16',
+	dialog: '#FFFFFF',
 	fontFamily: 'Inter',
 	borderRadius: 0.8,
 	error: '#EF6868',
@@ -38,6 +38,7 @@ const theme: Theme = {
 	active: '#407CF8',
 	success: '#1A9550',
 	warning: '#EF6868',
+	// tokenColorExtraction: true,
 };
 
 const UniswapModal: FC<UniswapModalProps> = ({
@@ -49,11 +50,12 @@ const UniswapModal: FC<UniswapModalProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const { provider, network } = Connector.useContainer();
-	console.log(DEFAULT_TOKEN_LIST);
 	const infuraRpc = getInfuraRpcURL(network.id);
-	const TOKEN_LIST = tokenList || DEFAULT_TOKEN_LIST.filter((t) => t.chainId === network.id);
+	const normalizedTokenList = (tokenList || DEFAULT_TOKEN_LIST).filter(
+		(t) => t.chainId === network.id
+	);
 	const OUTPUT_TOKEN_ADDRESS =
-		outputTokenAddress || TOKEN_LIST.find((t) => t.symbol === Synths.sUSD)?.address!;
+		outputTokenAddress || normalizedTokenList.find((t) => t.symbol === Synths.sUSD)?.address!;
 
 	return (
 		<StyledBaseModal onDismiss={onDismiss} isOpen={isOpen} title="">
@@ -62,7 +64,7 @@ const UniswapModal: FC<UniswapModalProps> = ({
 					theme={theme}
 					provider={provider as any}
 					jsonRpcEndpoint={infuraRpc}
-					tokenList={TOKEN_LIST}
+					tokenList={normalizedTokenList}
 					defaultInputTokenAddress={inputTokenAddress || NATIVE}
 					defaultOutputTokenAddress={OUTPUT_TOKEN_ADDRESS}
 					onError={(error, info) => console.error(error, info)}
