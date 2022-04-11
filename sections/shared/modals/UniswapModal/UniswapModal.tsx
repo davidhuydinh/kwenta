@@ -1,5 +1,7 @@
 import { Synths } from '@synthetixio/contracts-interface';
 import { SwapWidget, Theme, TokenInfo } from '@uniswap/widgets';
+import '@uniswap/widgets/dist/fonts.css';
+
 import BaseModal from 'components/BaseModal';
 import Connector from 'containers/Connector';
 import { FC } from 'react';
@@ -28,7 +30,7 @@ const theme: Theme = {
 	module: '#DBE1F5',
 	accent: '#C9975B',
 	dialog: '#FFFFFF',
-	fontFamily: 'Inter',
+	fontFamily: 'AkkuratMonoLLWeb-Regular',
 	borderRadius: 0.8,
 	error: '#EF6868',
 	// outline: '',
