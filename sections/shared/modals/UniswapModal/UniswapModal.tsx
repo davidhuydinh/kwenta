@@ -77,6 +77,7 @@ export default UniswapModal;
 
 const StyledBaseModal = styled(BaseModal)`
 	[data-reach-dialog-content] {
+		width: fit-content;
 		display: flex;
 		justify-content: center;
 	}
