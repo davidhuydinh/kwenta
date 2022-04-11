@@ -6,6 +6,8 @@ import { Synths } from 'constants/currency';
 import Connector from 'containers/Connector';
 import { useRouter } from 'next/router';
 import { FuturesPosition } from 'queries/futures/types';
+import useGetFuturesMarkets from 'queries/futures/useGetFuturesMarkets';
+import useGetFuturesPositionForMarkets from 'queries/futures/useGetFuturesPositionForMarkets';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,14 +27,10 @@ type ReactSelectOptionProps = {
 };
 
 type FuturesPositionTableProps = {
-	futuresPositions: FuturesPosition[];
 	setShowUniswapWidget: Dispatch<SetStateAction<boolean>>;
 };
 
-const BalanceActions: FC<FuturesPositionTableProps> = ({
-	futuresPositions,
-	setShowUniswapWidget,
-}) => {
+const BalanceActions: FC<FuturesPositionTableProps> = ({ setShowUniswapWidget }) => {
 	const [balanceLabel, setBalanceLabel] = useState('');
 	const { t } = useTranslation();
 	const theme = useTheme();
@@ -44,6 +42,13 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 	const synthsBalancesQuery = useSynthsBalancesQuery(walletAddress);
 	const sUSDBalance = synthsBalancesQuery?.data?.balancesMap?.[Synths.sUSD]?.balance ?? zeroBN;
 
+	const futuresMarketsQuery = useGetFuturesMarkets();
+	const futuresMarkets = futuresMarketsQuery?.data ?? [];
+	const futuresPositionQuery = useGetFuturesPositionForMarkets(
+		futuresMarkets.map(({ asset }) => getMarketKey(asset, network.id))
+	);
+	const futuresPositions = futuresPositionQuery?.data ?? [];
+
 	const accessiblePositions = futuresPositions.filter((position) =>
 		position.accessibleMargin.gt(zeroBN)
 	);
@@ -53,15 +58,16 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 		zeroBN
 	);
 
-	const setMarketConfig = (asset: string) => {
+	const setMarketConfig = (market: FuturesPosition): ReactSelectOptionProps => {
 		const accessibleMargin =
-			futuresPositions.find((posittion) => posittion.asset === asset)?.accessibleMargin ?? zeroBN;
+			futuresPositions.find((posittion) => posittion.asset === market.asset)?.accessibleMargin ??
+			zeroBN;
 
-		const marketKey = getMarketKey(asset, network.id);
+		const marketKey = getMarketKey(market.asset, network.id);
 
 		return {
-			label: `${getDisplayAsset(asset, network.id)}-PERP`,
-			synthIcon: marketKey,
+			label: `${getDisplayAsset(market.asset, network.id)}-PERP`,
+			synthIcon: market.asset,
 			marketAccessibleMargin: formatCurrency(Synths.sUSD, accessibleMargin, { sign: '$' }),
 			onClick: () => router.push(`/market/${marketKey}`),
 		};
@@ -71,7 +77,7 @@ const BalanceActions: FC<FuturesPositionTableProps> = ({
 		{
 			label: 'header.balance.margin-label',
 			totalAvailableMargin: formatCurrency(Synths.sUSD, totalAccessibleMargin, { sign: '$' }),
-			options: accessiblePositions.map((market) => setMarketConfig(market.asset)),
+			options: accessiblePositions.map(setMarketConfig),
 		},
 	];
 

@@ -15,8 +15,6 @@ import SettingsModal from 'sections/shared/modals/SettingsModal';
 import NetworksSwitcher from '../NetworksSwitcher';
 import WalletActions from '../WalletActions';
 import ConnectionDot from '../ConnectionDot';
-import useGetFuturesMarkets from 'queries/futures/useGetFuturesMarkets';
-import useGetFuturesPositionForMarkets from 'queries/futures/useGetFuturesPositionForMarkets';
 import UniswapModal from 'sections/shared/modals/UniswapModal';
 import BalanceActions from '../BalanceActions';
 
@@ -27,23 +25,11 @@ const UserMenu: FC = () => {
 	const [settingsModalOpened, setSettingsModalOpened] = useState<boolean>(false);
 	const [uniswapWidgetOpened, setUniswapWidgetOpened] = useState<boolean>(false);
 
-	const futuresMarketsQuery = useGetFuturesMarkets();
-	const futuresMarkets = futuresMarketsQuery?.data ?? [];
-	const futuresPositionQuery = useGetFuturesPositionForMarkets(
-		futuresMarkets.map(({ asset }) => asset)
-	);
-	const futuresPositions = futuresPositionQuery?.data ?? [];
-
 	return (
 		<>
 			<Container>
 				<FlexDivCentered>
-					{isWalletConnected && (
-						<BalanceActions
-							futuresPositions={futuresPositions}
-							setShowUniswapWidget={setUniswapWidgetOpened}
-						/>
-					)}
+					{isWalletConnected && <BalanceActions setShowUniswapWidget={setUniswapWidgetOpened} />}
 					{isWalletConnected && <NetworksSwitcher />}
 					{isWalletConnected ? (
 						<WalletActions />
